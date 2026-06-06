@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DRE Loja - App Interativo</title>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <main class="container">
+      <h1>DRE da Empresa</h1>
+      <p>
+        Preencha os dados do mês. Campos em branco serão tratados como zero.
+      </p>
+
+      <section class="card">
+        <h2>Período e regime</h2>
+        <div class="grid">
+          <label
+            >Mês de referência
+            <input id="mesReferencia" type="month" />
+          </label>
+          <label
+            title="Quando marcado, os impostos são reconhecidos como despesa no mês seguinte (X+1), conforme competência."
+          >
+            <input id="impostoCompetenciaX1" type="checkbox" />
+            Imposto reconhecido em X+1
+          </label>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Entradas principais</h2>
+        <div class="grid two-cols">
+          <label title="Valor total de vendas/faturamento do mês antes de deduções.">
+            Receita bruta
+            <input id="receitaBruta" type="number" step="0.01" placeholder="Ex.: 50000" />
+          </label>
+          <label title="Impostos/abatimentos sobre a receita (ISS, ICMS, devoluções etc.).">
+            Deduções da receita
+            <input id="deducoesReceita" type="number" step="0.01" placeholder="Ex.: 3500" />
+          </label>
+          <label title="Custos diretamente ligados ao produto/serviço vendido. Campo opcional.">
+            Custos (CMV/CPV/CSP)
+            <input id="custos" type="number" step="0.01" placeholder="Opcional" />
+          </label>
+          <label title="Receitas financeiras (ex.: rendimento em conta). Campo opcional.">
+            Receitas financeiras
+            <input id="receitasFinanceiras" type="number" step="0.01" placeholder="Opcional" />
+          </label>
+          <label title="Despesas financeiras (juros, tarifas bancárias etc.). Campo opcional.">
+            Despesas financeiras
+            <input id="despesasFinanceiras" type="number" step="0.01" placeholder="Opcional" />
+          </label>
+          <label title="IRPJ/CSLL do mês, se já conhecido. Campo opcional.">
+            IRPJ/CSLL
+            <input id="ircsll" type="number" step="0.01" placeholder="Opcional" />
+          </label>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Despesas operacionais</h2>
+        <div class="grid two-cols">
+          <label title="Conta de energia elétrica do mês.">
+            Luz
+            <input id="despesaLuz" type="number" step="0.01" placeholder="Opcional" />
+          </label>
+          <label title="Conta de água do mês.">
+            Água
+            <input id="despesaAgua" type="number" step="0.01" placeholder="Opcional" />
+          </label>
+          <label title="Telefone, internet e comunicação.">
+            Telefone
+            <input id="despesaTelefone" type="number" step="0.01" placeholder="Opcional" />
+          </label>
+          <label title="Campanhas e anúncios.">
+            Marketing
+            <input id="despesaMarketing" type="number" step="0.01" placeholder="Opcional" />
+          </label>
+          <label title="Parcelas e juros de empréstimos antigos.">
+            Empréstimos antigos
+            <input id="despesaEmprestimos" type="number" step="0.01" placeholder="Opcional" />
+          </label>
+          <label title="Folha salarial bruta.">
+            Salários
+            <input id="despesaSalarios" type="number" step="0.01" placeholder="Opcional" />
+          </label>
+          <label title="Honorários contábeis.">
+            Contabilidade
+            <input id="despesaContabilidade" type="number" step="0.01" placeholder="Opcional" />
+          </label>
+          <label title="Contribuição INSS patronal e afins.">
+            INSS
+            <input id="despesaINSS" type="number" step="0.01" placeholder="Opcional" />
+          </label>
+          <label title="Impostos operacionais (separados de deduções da receita).">
+            Imposto
+            <input id="despesaImposto" type="number" step="0.01" placeholder="Opcional" />
+          </label>
+          <label title="FGTS sobre folha.">
+            FGTS
+            <input id="despesaFGTS" type="number" step="0.01" placeholder="Opcional" />
+          </label>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Extrato bancário (CSV)</h2>
+        <p>
+          Para consulta rápida, envie um CSV com colunas típicas como: data,
+          descrição/histórico e valor.
+        </p>
+        <div class="grid">
+          <label title="Aceita CSV separado por vírgula ou ponto e vírgula.">
+            Upload do extrato
+            <input id="arquivoExtrato" type="file" accept=".csv,text/csv" />
+          </label>
+          <div id="resumoExtrato" class="muted">Nenhum extrato carregado.</div>
+        </div>
+        <details>
+          <summary>Ver itens do extrato</summary>
+          <div class="table-wrapper">
+            <table id="tabelaExtrato">
+              <thead>
+                <tr>
+                  <th>Data</th>
+                  <th>Descrição</th>
+                  <th>Valor</th>
+                  <th>Categoria sugerida</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </details>
+      </section>
+
+      <section class="card">
+        <h2>Validação assistida por IA (opcional)</h2>
+        <div class="grid two-cols">
+          <label title="Endpoint compatível com API de chat completions.">
+            Endpoint IA
+            <input id="aiEndpoint" type="url" placeholder="Ex.: https://api.openai.com/v1/chat/completions" />
+          </label>
+          <label title="Modelo a ser usado no endpoint informado.">
+            Modelo IA
+            <input id="aiModel" type="text" placeholder="Ex.: gpt-4o-mini" />
+          </label>
+          <label title="Chave de API usada apenas localmente no seu navegador.">
+            API Key
+            <input id="aiApiKey" type="password" placeholder="Opcional" />
+          </label>
+        </div>
+      </section>
+
+      <section class="actions">
+        <button id="btnCalcular" title="Calcula o DRE e atualiza os indicadores principais.">
+          Calcular DRE
+        </button>
+        <button id="btnValidarIA" title="Valida os dados com IA ou com regras locais caso IA não esteja configurada.">
+          Validar com IA
+        </button>
+      </section>
+
+      <section class="card">
+        <h2>Resultado</h2>
+        <div id="resultadoDre" class="result"></div>
+        <pre id="validacaoIA" class="result muted"></pre>
+      </section>
+    </main>
+
+    <script src="./app.js"></script>
+  </body>
+</html>
