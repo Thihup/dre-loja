@@ -30,6 +30,12 @@ const parseAmount = (rawValue) => {
   return Number.isFinite(parsed) ? parsed : 0;
 };
 
+const normalizeText = (value) =>
+  String(value || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase();
+
 const idsDespesasOperacionais = [
   "despesaLuz",
   "despesaAgua",
@@ -111,13 +117,13 @@ const renderDre = (dre) => {
 };
 
 const inferCategoria = (descricao) => {
-  const text = (descricao || "").toLowerCase();
+  const text = normalizeText(descricao);
   if (text.includes("luz") || text.includes("energia")) return "Luz";
-  if (text.includes("água") || text.includes("agua")) return "Água";
+  if (text.includes("agua")) return "Água";
   if (text.includes("telefone") || text.includes("internet")) return "Telefone";
-  if (text.includes("marketing") || text.includes("anúncio") || text.includes("anuncio")) return "Marketing";
-  if (text.includes("empréstimo") || text.includes("emprestimo") || text.includes("juros")) return "Empréstimos antigos";
-  if (text.includes("salário") || text.includes("salario") || text.includes("folha")) return "Salários";
+  if (text.includes("marketing") || text.includes("anuncio")) return "Marketing";
+  if (text.includes("emprestimo") || text.includes("juros")) return "Empréstimos antigos";
+  if (text.includes("salario") || text.includes("folha")) return "Salários";
   if (text.includes("contabilidade") || text.includes("contador")) return "Contabilidade";
   if (text.includes("inss")) return "INSS";
   if (text.includes("fgts")) return "FGTS";
@@ -129,11 +135,11 @@ const parseCsv = (text) => {
   const lines = text.split(/\r?\n/).filter(Boolean);
   if (!lines.length) return [];
   const delimiter = lines[0].includes(";") ? ";" : ",";
-  const headers = lines[0].split(delimiter).map((h) => h.trim().toLowerCase());
+  const headers = lines[0].split(delimiter).map((h) => normalizeText(h.trim()));
   const findIndex = (candidates) =>
-    headers.findIndex((h) => candidates.some((c) => h.includes(c)));
+    headers.findIndex((h) => candidates.some((c) => h.includes(normalizeText(c))));
   const idxData = findIndex(["data", "date"]);
-  const idxDescricao = findIndex(["descrição", "descricao", "histórico", "historico", "memo"]);
+  const idxDescricao = findIndex(["descricao", "historico", "memo"]);
   const idxValor = findIndex(["valor", "amount"]);
 
   return lines.slice(1).map((line) => {
@@ -179,7 +185,10 @@ const renderExtrato = (rows) => {
 const localValidate = (dre) => {
   const mensagens = [];
   if (dre.receitaBruta <= 0) mensagens.push("Receita bruta não informada ou igual a zero.");
-  if (dre.deducoesAjustadas < 0) mensagens.push("Deduções da receita ficaram negativas. Revise imposto em X+1.");
+  if (dre.deducoesAjustadas < 0)
+    mensagens.push(
+      "Deduções da receita negativas. Se marcou 'Imposto reconhecido em X+1', confira se o imposto foi lançado no mês correto."
+    );
   if (dre.receitaLiquida < 0) mensagens.push("Receita líquida negativa, revisar entradas.");
   if (dre.lucroLiquido < 0) mensagens.push("Lucro líquido negativo no mês (prejuízo).");
   if (!mensagens.length) mensagens.push("Validação local: estrutura coerente com entradas informadas.");
